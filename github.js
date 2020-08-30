@@ -63,9 +63,6 @@ const helpFrenz = async () => {
         try {
           const nextText = await page.evaluate(() => document.querySelector('.BtnGroup').childNodes[1].innerText);
           const moreRepos = await page.evaluate(() => document.querySelector('.BtnGroup').childNodes[1].getAttribute('href'));
-          console.log(moreRepos)
-
-          console.log('in here', nextText)
           if (nextText === 'Next' && moreRepos !== null) {
             console.log('link to more repos ', moreRepos);
             await nextPage(moreRepos);
@@ -77,6 +74,7 @@ const helpFrenz = async () => {
         }
       }
     }
+    browser.close()
   } catch (err) {
     console.log(err);
   }
