@@ -13,7 +13,7 @@ const password = '';
 const frenz = [];
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     // set to reasonable size to see what's going on... comment out if you set headless: true
