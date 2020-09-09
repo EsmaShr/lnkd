@@ -6,17 +6,17 @@
 /* eslint-disable no-console */
 const puppeteer = require('puppeteer');
 
-const fs = require('fs');
+const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
 
-const getFrenz = () => {
-  const rawFrenz = fs.readFileSync('people.json');
-  const parsed = JSON.parse(rawFrenz);
-  return parsed.frenz;
-};
+let frenz = getFromFile('people.json');
+const saveSeen = saveToFile('people.json');
+
+if (resetFlagSet()) {
+  frenz = resetSeen(frenz);
+}
 
 const username = process.env.USERNAME;
 const password = process.env.PASSWORD;
-const frenz = getFrenz();
 const helpFrenz = async () => {
   try {
     const browser = await puppeteer.launch({ headless: true });
@@ -40,8 +40,8 @@ const helpFrenz = async () => {
     // wait for 4 seconds... helps block the linkedin authwall for some reason
     await page.waitFor(4000);
 
-    for (let i = 0; i < frenz.length; i += 1) {
-      const fren = frenz[i];
+    for (const fren of frenz) {
+      if (fren.didVisit) continue;
       const name = fren.name;
       await page.goto(fren.url);
       // check for pending connection
@@ -71,6 +71,8 @@ const helpFrenz = async () => {
           if (skillz.length > 0) {
             console.log(`more skillz to click for ${name}, rerun the app and you should grab them`);
           } else {
+            fren.didVisit = true;
+            saveSeen(frenz);
             console.log(`all skillz clicked for ${name}`);
           }
         } catch (err) {

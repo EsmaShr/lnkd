@@ -7,21 +7,30 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
 const puppeteer = require('puppeteer');
-const fs = require('fs');
-
-const getProjects = () => {
-  const rawProjects = fs.readFileSync('projects.json');
-  const parsed = JSON.parse(rawProjects);
-  return parsed.projects;
-};
+const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
 
 const username = process.env.USERNAME;
 const password = process.env.PASSWORD;
-const frenz = getProjects();
+let frenz = getFromFile('projects.json');
+const saveSeen = saveToFile('projects.json');
+
+if (resetFlagSet()) {
+  frenz = resetSeen(frenz);
+}
+
 const helpFrenz = async () => {
   try {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      const type = req.resourceType();
+      if (type === 'image' || type === 'stylesheet' || type === 'font') {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     // await page.setViewport({ width: 1280, height: 800 });
     await page.goto('https://github.com/login');
 
@@ -42,6 +51,10 @@ const helpFrenz = async () => {
     const repoClicker = async (arr) => {
       for (let i = 0; i < arr.length; i += 1) {
         const fren = arr[i];
+        if (frenz[fren]?.didVisit) {
+          console.log(`${frenz[fren].name} already clicked, skipping.`);
+          continue;
+        }
         await page.goto(fren);
         await page.waitForSelector('strong[itemprop="name"]');
         const name = await page.$eval(
@@ -54,6 +67,8 @@ const helpFrenz = async () => {
           console.log(err);
           continue;
         }
+        frenz[fren] = { name, url: fren, didVisit: true };
+        saveSeen(frenz);
         console.log(`${name} project clicked`);
       }
       return;
@@ -68,17 +83,18 @@ const helpFrenz = async () => {
         links = links.map((link) => link.href);
         return links;
       });
-      console.log(projectz);
+      // console.log(projectz);
 
       await repoClicker(projectz);
       await page.goto(url);
       await page.waitForSelector('.pagination');
-      if (await page.$('next_page.disabled')) {
-        console.log('undefined... should exit');
+
+      const nextPage = await page.evaluate(() => document.querySelector('.next_page').href);
+      if (!nextPage) {
+        console.log('No more pages found.  Exiting...');
         browser.close();
         return undefined;
       }
-      const nextPage = await page.evaluate(() => document.querySelector('.next_page').href);
       console.log(nextPage);
       return pageLoader(nextPage);
     };
