@@ -11,10 +11,9 @@ const puppeteer = require('puppeteer');
 const username = '';
 const password = '';
 const frenz = [];
-
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     // set to reasonable size to see what's going on... comment out if you set headless: true
@@ -28,7 +27,6 @@ const helpFrenz = async () => {
     await page.focus('#password');
     await page.keyboard.type(password);
 
-    await page.waitForSelector('button.btn__primary--large.from__button--floating');
     await page.click('button.btn__primary--large.from__button--floating');
 
     // wait for 4 seconds... helps block the linkedin authwall for some reason
@@ -58,17 +56,13 @@ const helpFrenz = async () => {
         try {
           await page.waitForSelector('.pv-skills-section__chevron-icon', { timeout: 3000 });
           await page.click('.pv-skills-section__chevron-icon');
+          await page.$$eval('[type="plus-icon"]', (skillz) => skillz.forEach((skill) => skill.click()));
           const skillz = await page.$$('[type="plus-icon"]');
-          if (skillz.length !== 0) {
-            for (const skill of skillz) {
-              await skill.click();
-              console.log(`skill clicked for ${name}`);
-              // press escape to clear the popup so other items are able to be clicked... sometimes the popup blocks the button
-              await page.waitForSelector('.artdeco-hoverable-content');
-              await page.keyboard.type(String.fromCharCode(13));
-            }
+          if (skillz.length > 0) {
+            console.log(`more skillz to click for ${name}, rerun the app and you should grab them`);
+          } else {
+            console.log(`all skillz clicked for ${name}`);
           }
-          console.log(`no skills to click for ${name}`);
         } catch (err) {
           continue;
         }
