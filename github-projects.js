@@ -39,19 +39,50 @@ const helpFrenz = async () => {
 
     await page.waitFor(3000);
 
-    for (let i = 0; i < frenz.length; i += 1) {
-      const fren = frenz[i];
-      await page.goto(fren);
-      await page.waitForSelector('strong[itemprop="name"]');
-      const name = await page.$eval('strong[itemprop="name"]', (foundname) => foundname.innerText);
-      try {
-        await page.$eval('.unstarred button[type="submit"]', (repo) => repo.click());
-      } catch (err) {
-        console.log(err);
-        continue;
+    const repoClicker = async (arr) => {
+      for (let i = 0; i < arr.length; i += 1) {
+        const fren = arr[i];
+        await page.goto(fren);
+        await page.waitForSelector('strong[itemprop="name"]');
+        const name = await page.$eval(
+          'strong[itemprop="name"]',
+          (foundname) => foundname.innerText
+        );
+        try {
+          await page.$eval('.unstarred button[type="submit"]', (repo) => repo.click());
+        } catch (err) {
+          console.log(err);
+          continue;
+        }
+        console.log(`${name} project clicked`);
       }
-      console.log(`${name} project clicked`);
-    }
+      return;
+    };
+
+    const pageLoader = async (url) => {
+      await page.goto(url);
+      await page.waitForSelector('.pagination');
+
+      const projectz = await page.evaluate(() => {
+        let links = Array.from(document.querySelectorAll('.wb-break-all a'));
+        links = links.map((link) => link.href);
+        return links;
+      });
+      console.log(projectz);
+
+      await repoClicker(projectz);
+      await page.goto(url);
+      await page.waitForSelector('.pagination');
+      if (await page.$('next_page.disabled')) {
+        console.log('undefined... should exit');
+        browser.close();
+        return undefined;
+      }
+      const nextPage = await page.evaluate(() => document.querySelector('.next_page').href);
+      console.log(nextPage);
+      return pageLoader(nextPage);
+    };
+    await pageLoader('https://github.com/oslabs-beta?page=1');
     browser.close();
   } catch (err) {
     console.log(err);
