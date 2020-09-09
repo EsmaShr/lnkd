@@ -7,26 +7,22 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
-const username = '';
-const password = '';
-const frenz = ['https://github.com/vuetwo/vuetron',	'https://github.com/oslabs-beta/SeeQR/', 'https://github.com/open-source-labs/Recoilize',	'https://github.com/oslabs-beta/Chromogen',	'https://github.com/open-source-labs/Swell',	'https://github.com/open-source-labs/reactime',	'https://github.com/open-source-labs/spearmint', 'https://github.com/oslabs-beta/tropicRPC',
-'https://github.com/oslabs-beta/Osiris',
-'https://github.com/oslabs-beta/TotalRecoilJS',
-'https://github.com/oslabs-beta/MASH',
-'https://github.com/oslabs-beta/Kafka-Sprout',
-'https://github.com/oslabs-beta/Horus',
-'https://github.com/oslabs-beta/ReactMonitor',
-'https://github.com/open-source-labs/Swell',
-'https://github.com/open-source-labs/Recoilize',
-'https://github.com/open-source-labs/ReacType',
-'https://github.com/open-source-labs/reactime',
-'https://github.com/oslabs-beta/dockerlocal'];
+const getProjects = () => {
+  const rawProjects = fs.readFileSync('projects.json');
+  const parsed = JSON.parse(rawProjects);
+  return parsed.projects;
+};
+
+const username = process.env.USERNAME;
+const password = process.env.PASSWORD;
+const frenz = getProjects();
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 800 });
+    // await page.setViewport({ width: 1280, height: 800 });
     await page.goto('https://github.com/login');
 
     // ----- LOGIN ----- //'

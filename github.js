@@ -7,15 +7,16 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
-const username = '';
-const password = '';
+const username = process.env.USERNAME;
+const password = process.env.PASSWORD;
 const frenz = [];
 const helpFrenz = async () => {
   try {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 800 });
+    // await page.setViewport({ width: 1280, height: 800 });
     await page.goto('https://github.com/login');
 
     // ----- LOGIN ----- //'
@@ -36,10 +37,14 @@ const helpFrenz = async () => {
       const fren = frenz[i];
       await page.goto(fren);
       const name = await page.$eval('.p-name', (item) => item.innerText);
-      await page.evaluate(() => document.querySelector('.js-form-toggle-target input[value="Follow"]').click())
+      await page.evaluate(() =>
+        document.querySelector('.js-form-toggle-target input[value="Follow"]').click()
+      );
       const repoPage = await page.evaluate(() => {
         const root = window.location.origin;
-        const clickLink = document.querySelector('.UnderlineNav-body a:nth-child(2)').getAttribute('href');
+        const clickLink = document
+          .querySelector('.UnderlineNav-body a:nth-child(2)')
+          .getAttribute('href');
         return root + clickLink;
       });
       console.log(repoPage);
@@ -61,8 +66,12 @@ const helpFrenz = async () => {
           console.log(`no more repos to click on this page for ${name}`);
         }
         try {
-          const nextText = await page.evaluate(() => document.querySelector('.BtnGroup').childNodes[1].innerText);
-          const moreRepos = await page.evaluate(() => document.querySelector('.BtnGroup').childNodes[1].getAttribute('href'));
+          const nextText = await page.evaluate(
+            () => document.querySelector('.BtnGroup').childNodes[1].innerText
+          );
+          const moreRepos = await page.evaluate(() =>
+            document.querySelector('.BtnGroup').childNodes[1].getAttribute('href')
+          );
           if (nextText === 'Next' && moreRepos !== null) {
             console.log('link to more repos ', moreRepos);
             await nextPage(moreRepos);
@@ -74,7 +83,7 @@ const helpFrenz = async () => {
         }
       }
     }
-    browser.close()
+    browser.close();
   } catch (err) {
     console.log(err);
   }

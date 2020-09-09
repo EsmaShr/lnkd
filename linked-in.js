@@ -6,19 +6,27 @@
 /* eslint-disable no-console */
 const puppeteer = require('puppeteer');
 
-// ----------- FILL IN USERNAME AND PASS AND LINKEDIN URLS INTO FRENZ ARRAY ------------//
+const fs = require('fs');
 
-const username = '';
-const password = '';
-const frenz = [];
+const getFrenz = () => {
+  const rawFrenz = fs.readFileSync('people.json');
+  const parsed = JSON.parse(rawFrenz);
+  return parsed.frenz;
+};
+
+const username = process.env.USERNAME;
+const password = process.env.PASSWORD;
+const frenz = getFrenz();
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     // set to reasonable size to see what's going on... comment out if you set headless: true
-    await page.setViewport({ width: 1280, height: 800 });
-    await page.goto('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin');
+    // await page.setViewport({ width: 1280, height: 800 });
+    await page.goto(
+      'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin'
+    );
     await page.waitForSelector('#username');
     await page.focus('#username');
     await page.keyboard.type(username);
@@ -34,16 +42,16 @@ const helpFrenz = async () => {
 
     for (let i = 0; i < frenz.length; i += 1) {
       const fren = frenz[i];
-      await page.goto(fren);
-      const name = await page.$eval('.pv-top-card--list li:first-child', (item) => item.innerText);
+      const name = fren.name;
+      await page.goto(fren.url);
       // check for pending connection
-      if (await page.$('.artdeco-button--disabled') !== null) {
+      if ((await page.$('.artdeco-button--disabled')) !== null) {
         console.log(`pending connection with ${name}`);
         continue;
       }
 
       // if you can dm then you are connected and we can scroll down to skills... otherwise add connection and move on
-      if (await page.$('.pv-s-profile-actions--message') !== null) {
+      if ((await page.$('.pv-s-profile-actions--message')) !== null) {
         await page.evaluate(() => {
           window.scrollTo({
             left: 0,
@@ -56,7 +64,9 @@ const helpFrenz = async () => {
         try {
           await page.waitForSelector('.pv-skills-section__chevron-icon', { timeout: 3000 });
           await page.click('.pv-skills-section__chevron-icon');
-          await page.$$eval('[type="plus-icon"]', (skillz) => skillz.forEach((skill) => skill.click()));
+          await page.$$eval('[type="plus-icon"]', (skillz) =>
+            skillz.forEach((skill) => skill.click())
+          );
           const skillz = await page.$$('[type="plus-icon"]');
           if (skillz.length > 0) {
             console.log(`more skillz to click for ${name}, rerun the app and you should grab them`);
