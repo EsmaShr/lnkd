@@ -16,7 +16,7 @@ THINGS YOU WILL NEED:
 
    - projects.json: this I think you can actually seed with an empty object, since the script is just going to go through all the OSLabs repos and star them.
 
-   - credentials.json: this is your login information for github and linkedin. this should have the following shape:
+   - credentials.json: (make sure you change the example file) this is your login information for github and linkedin. this should have the following shape:
 
      - {username: string, linkedin: {username: string, password: string}, github: {username: string, password: string}}
 
