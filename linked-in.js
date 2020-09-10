@@ -6,44 +6,49 @@
 /* eslint-disable no-console */
 const puppeteer = require('puppeteer');
 
-// ----------- FILL IN USERNAME AND PASS AND LINKEDIN URLS INTO FRENZ ARRAY ------------//
+const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
+const { preventStaticAssetLoading, login, launchPage } = require('./utils/puppeteerUtils');
 
-const username = '';
-const password = '';
-const frenz = [];
+let frenz = getFromFile('people.json');
+let { username } = getFromFile('credentials.json');
+const saveSeen = saveToFile('people.json');
+
+const LOGIN_PAGE_URL =
+  'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin';
+
+if (resetFlagSet()) frenz = resetSeen(frenz, 'linkedin');
+
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    let { page, browser } = await launchPage();
 
-    // set to reasonable size to see what's going on... comment out if you set headless: true
-    await page.setViewport({ width: 1280, height: 800 });
-    await page.goto('https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin');
-    await page.waitForSelector('#username');
-    await page.focus('#username');
-    await page.keyboard.type(username);
+    // prevents loading of images / css assets / fonts
+    page = await preventStaticAssetLoading(page);
 
-    await page.waitForSelector('#password');
-    await page.focus('#password');
-    await page.keyboard.type(password);
+    await page.goto(LOGIN_PAGE_URL);
 
-    await page.click('button.btn__primary--large.from__button--floating');
+    // LOGIN
+    page = await login(page, 'linkedin');
 
-    // wait for 4 seconds... helps block the linkedin authwall for some reason
-    await page.waitFor(4000);
-
-    for (let i = 0; i < frenz.length; i += 1) {
-      const fren = frenz[i];
-      await page.goto(fren);
-      const name = await page.$eval('.pv-top-card--list li:first-child', (item) => item.innerText);
+    for (const fren of frenz) {
+      if (fren.name === username) {
+        console.log(`${fren.name} --- is you --- skipping....`);
+        continue;
+      }
+      if (fren.linkedin.didVisit) {
+        console.log(fren.name, ' --- already helped --- skipping...');
+        continue;
+      }
+      const { name } = fren;
+      await page.goto(fren.linkedin.url);
       // check for pending connection
-      if (await page.$('.artdeco-button--disabled') !== null) {
+      if ((await page.$('.artdeco-button--disabled')) !== null) {
         console.log(`pending connection with ${name}`);
         continue;
       }
 
       // if you can dm then you are connected and we can scroll down to skills... otherwise add connection and move on
-      if (await page.$('.pv-s-profile-actions--message') !== null) {
+      if ((await page.$('.pv-s-profile-actions--message')) !== null) {
         await page.evaluate(() => {
           window.scrollTo({
             left: 0,
@@ -56,11 +61,15 @@ const helpFrenz = async () => {
         try {
           await page.waitForSelector('.pv-skills-section__chevron-icon', { timeout: 3000 });
           await page.click('.pv-skills-section__chevron-icon');
-          await page.$$eval('[type="plus-icon"]', (skillz) => skillz.forEach((skill) => skill.click()));
+          await page.$$eval('[type="plus-icon"]', (skillz) =>
+            skillz.forEach((skill) => skill.click())
+          );
           const skillz = await page.$$('[type="plus-icon"]');
           if (skillz.length > 0) {
             console.log(`more skillz to click for ${name}, rerun the app and you should grab them`);
           } else {
+            fren.linkedin.didVisit = true;
+            saveSeen(frenz);
             console.log(`all skillz clicked for ${name}`);
           }
         } catch (err) {
