@@ -8,51 +8,32 @@
 /* eslint-disable no-await-in-loop */
 const puppeteer = require('puppeteer');
 const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
+const { preventStaticAssetLoading, login, launchPage } = require('./utils/puppeteerUtils');
 
-const username = process.env.USERNAME;
-const password = process.env.PASSWORD;
+const GITHUB_LOGIN_URL = 'https://github.com/login';
+const OS_LABS_URL = 'https://github.com/oslabs-beta?page=1';
+
 let frenz = getFromFile('projects.json');
 const saveSeen = saveToFile('projects.json');
 
-if (resetFlagSet()) {
-  frenz = resetSeen(frenz);
-}
+if (resetFlagSet()) frenz = resetSeen(frenz);
 
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-    page.on('request', (req) => {
-      const type = req.resourceType();
-      if (type === 'image' || type === 'stylesheet' || type === 'font') {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
-    // await page.setViewport({ width: 1280, height: 800 });
-    await page.goto('https://github.com/login');
+    let { page, browser } = await launchPage();
 
-    // ----- LOGIN ----- //'
-    await page.waitForSelector('#login_field');
-    await page.focus('#login_field');
-    await page.keyboard.type(username);
+    // prevents loading of images / css assets / fonts
+    page = await preventStaticAssetLoading(page);
 
-    await page.waitForSelector('#password');
-    await page.focus('#password');
-    await page.keyboard.type(password);
+    await page.goto(GITHUB_LOGIN_URL);
 
-    await page.$('[type="submit"]');
-    await page.click('[type="submit"]');
+    // LOGIN
+    page = await login(page, 'github');
 
-    await page.waitFor(3000);
-
-    const repoClicker = async (arr) => {
-      for (let i = 0; i < arr.length; i += 1) {
-        const fren = arr[i];
+    const repoClicker = async (projectList) => {
+      for (let fren of projectList) {
         if (frenz[fren]?.didVisit) {
-          console.log(`${frenz[fren].name} already clicked, skipping.`);
+          console.log(`${frenz[fren].name} --- already clicked --- skipping.`);
           continue;
         }
         await page.goto(fren);
@@ -86,6 +67,8 @@ const helpFrenz = async () => {
       // console.log(projectz);
 
       await repoClicker(projectz);
+
+      // go back to page to visit next group of projects
       await page.goto(url);
       await page.waitForSelector('.pagination');
 
@@ -98,7 +81,7 @@ const helpFrenz = async () => {
       console.log(nextPage);
       return pageLoader(nextPage);
     };
-    await pageLoader('https://github.com/oslabs-beta?page=1');
+    await pageLoader(OS_LABS_URL);
     browser.close();
   } catch (err) {
     console.log(err);

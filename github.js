@@ -7,36 +7,43 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable no-await-in-loop */
 const puppeteer = require('puppeteer');
-const fs = require('fs');
+const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
+const { preventStaticAssetLoading, login, launchPage } = require('./utils/puppeteerUtils');
 
-const username = process.env.USERNAME;
-const password = process.env.PASSWORD;
-const frenz = [];
+const GITHUB_LOGIN_URL = 'https://github.com/login';
+
+let frenz = getFromFile('people.json');
+const { username } = getFromFile('credentials.json');
+const saveSeen = saveToFile('people.json');
+
+if (resetFlagSet()) frenz = resetSeen(frenz, 'github');
+
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    // await page.setViewport({ width: 1280, height: 800 });
-    await page.goto('https://github.com/login');
+    let { page, browser } = await launchPage();
 
-    // ----- LOGIN ----- //'
-    await page.waitForSelector('#login_field');
-    await page.focus('#login_field');
-    await page.keyboard.type(username);
+    // prevents loading of images / css assets / fonts
+    page = await preventStaticAssetLoading(page);
 
-    await page.waitForSelector('#password');
-    await page.focus('#password');
-    await page.keyboard.type(password);
+    await page.goto(GITHUB_LOGIN_URL);
 
-    await page.$('[type="submit"]');
-    await page.click('[type="submit"]');
-
-    await page.waitFor(3000);
-
-    for (let i = 0; i < frenz.length; i += 1) {
-      const fren = frenz[i];
-      await page.goto(fren);
-      const name = await page.$eval('.p-name', (item) => item.innerText);
+    // LOGIN
+    page = await login(page, 'github');
+    for (let fren of frenz) {
+      if (fren.github.didVisit) {
+        console.log(`${fren.name} --- already helped --- skipping....`);
+        continue;
+      }
+      if (fren.name === username) {
+        console.log(`${fren.name} --- is you --- skipping....`);
+        continue;
+      }
+      if (!fren.github.url.length) {
+        console.log(`${fren.name} --- no url found --- skipping....`);
+        continue;
+      }
+      await page.goto(fren.github.url);
+      const { name } = fren;
       await page.evaluate(() =>
         document.querySelector('.js-form-toggle-target input[value="Follow"]').click()
       );
@@ -47,22 +54,26 @@ const helpFrenz = async () => {
           .getAttribute('href');
         return root + clickLink;
       });
-      console.log(repoPage);
+      // console.log(repoPage);
       await nextPage(repoPage);
 
       async function nextPage(url) {
         await page.goto(url);
         await page.$('#user-repositories-list');
-        console.log('repos loaded');
+        // console.log('repos loaded');
         const repos = await page.$$('button[value="Star"]');
-        console.log(repos.length);
+        console.log(repos.length, 'repos found for', name);
         if (repos.length !== 0) {
           for (const repo of repos) {
             repo.click();
             await page.waitFor(150);
             console.log(`repo clicked for ${name}`);
           }
+          fren.github.didVisit = true;
+          saveSeen(frenz);
         } else {
+          fren.github.didVisit = true;
+          saveSeen(frenz);
           console.log(`no more repos to click on this page for ${name}`);
         }
         try {

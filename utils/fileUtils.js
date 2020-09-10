@@ -16,12 +16,12 @@ const saveToFile = (filename) => (object) => {
   fs.writeFileSync(filePath, JSONstring);
 };
 
-const resetSeen = (all) => {
+const resetSeen = (all, site) => {
   if (Array.isArray(all)) {
     all = all.map((entry) => ({ ...entry, didVisit: false }));
   } else {
     const keys = Object.keys(all);
-    for (let key of keys) all[key].didVisit = false;
+    for (let key of keys) all[key][site].didVisit = false;
   }
   return all;
 };

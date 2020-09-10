@@ -7,43 +7,40 @@
 const puppeteer = require('puppeteer');
 
 const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
+const { preventStaticAssetLoading, login, launchPage } = require('./utils/puppeteerUtils');
 
 let frenz = getFromFile('people.json');
+let { username } = getFromFile('credentials.json');
 const saveSeen = saveToFile('people.json');
 
-if (resetFlagSet()) {
-  frenz = resetSeen(frenz);
-}
+const LOGIN_PAGE_URL =
+  'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin';
 
-const username = process.env.USERNAME;
-const password = process.env.PASSWORD;
+if (resetFlagSet()) frenz = resetSeen(frenz, 'linkedin');
+
 const helpFrenz = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    let { page, browser } = await launchPage();
 
-    // set to reasonable size to see what's going on... comment out if you set headless: true
-    // await page.setViewport({ width: 1280, height: 800 });
-    await page.goto(
-      'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin'
-    );
-    await page.waitForSelector('#username');
-    await page.focus('#username');
-    await page.keyboard.type(username);
+    // prevents loading of images / css assets / fonts
+    page = await preventStaticAssetLoading(page);
 
-    await page.waitForSelector('#password');
-    await page.focus('#password');
-    await page.keyboard.type(password);
+    await page.goto(LOGIN_PAGE_URL);
 
-    await page.click('button.btn__primary--large.from__button--floating');
-
-    // wait for 4 seconds... helps block the linkedin authwall for some reason
-    await page.waitFor(4000);
+    // LOGIN
+    page = await login(page, 'linkedin');
 
     for (const fren of frenz) {
-      if (fren.didVisit) continue;
-      const name = fren.name;
-      await page.goto(fren.url);
+      if (fren.name === username) {
+        console.log(`${fren.name} --- is you --- skipping....`);
+        continue;
+      }
+      if (fren.linkedin.didVisit) {
+        console.log(fren.name, ' --- already helped --- skipping...');
+        continue;
+      }
+      const { name } = fren;
+      await page.goto(fren.linkedin.url);
       // check for pending connection
       if ((await page.$('.artdeco-button--disabled')) !== null) {
         console.log(`pending connection with ${name}`);
@@ -71,7 +68,7 @@ const helpFrenz = async () => {
           if (skillz.length > 0) {
             console.log(`more skillz to click for ${name}, rerun the app and you should grab them`);
           } else {
-            fren.didVisit = true;
+            fren.linkedin.didVisit = true;
             saveSeen(frenz);
             console.log(`all skillz clicked for ${name}`);
           }
