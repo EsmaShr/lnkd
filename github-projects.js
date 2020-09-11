@@ -32,7 +32,7 @@ const helpFrenz = async () => {
 
     const repoClicker = async (projectList) => {
       for (let fren of projectList) {
-        if (frenz[fren]?.didVisit) {
+        if (frenz[fren].didVisit) {
           console.log(`${frenz[fren].name} --- already clicked --- skipping.`);
           continue;
         }

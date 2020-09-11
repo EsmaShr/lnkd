@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "csv-parser": "^2.3.3",
     "express": "^4.17.1",
+    "googleapis": "^39.2.0",
     "jest": "^26.4.2",
     "puppeteer": "^5.2.1"
   }

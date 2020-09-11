@@ -33,4 +33,5 @@ module.exports = {
   saveToFile,
   resetSeen,
   resetFlagSet,
+  makeFilePath,
 };
