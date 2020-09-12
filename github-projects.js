@@ -16,7 +16,7 @@ const OS_LABS_URL = 'https://github.com/oslabs-beta?page=1';
 let frenz = getFromFile('projects.json');
 const saveSeen = saveToFile('projects.json');
 
-if (resetFlagSet()) frenz = resetSeen(frenz);
+// if (resetFlagSet()) frenz = resetSeen(frenz);
 
 const helpFrenz = async () => {
   try {
@@ -32,9 +32,11 @@ const helpFrenz = async () => {
 
     const repoClicker = async (projectList) => {
       for (let fren of projectList) {
-        if (frenz[fren].didVisit) {
-          console.log(`${frenz[fren].name} --- already clicked --- skipping.`);
-          continue;
+        if (frenz[fren]) {
+          if (frenz[fren].didVisit) {
+            console.log(`${frenz[fren].name} --- already clicked --- skipping.`);
+            continue;
+          }
         }
         await page.goto(fren);
         await page.waitForSelector('strong[itemprop="name"]');

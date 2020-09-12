@@ -60,7 +60,10 @@ const helpFrenz = async () => {
       async function nextPage(url) {
         await page.goto(url);
         await page.$('#user-repositories-list');
-        // console.log('repos loaded');
+        // remove all already starred items before grabbing repos to star...
+        await page.$$eval('form[hidden="hidden"]', (starred) => {
+          starred.forEach(e => e.parentNode.removeChild(e));
+        });
         const repos = await page.$$('button[value="Star"]');
         console.log(repos.length, 'repos found for', name);
         if (repos.length !== 0) {
