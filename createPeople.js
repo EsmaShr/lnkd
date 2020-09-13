@@ -7,15 +7,15 @@ const { makeFilePath, getFromFile } = require('./utils/fileUtils');
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 
 const TOKEN_PATH = 'token.json';
-const { cohort } = getFromFile('credentials.json');
 const cohortPath = makeFilePath('people.json');
-const googleCredentials = makeFilePath('gapp-creds.json')
+const googleCredentials = makeFilePath('gapp-creds.json');
 
-fs.readFile(googleCredentials, (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), createPeople);
-});
+function oauthAndCreate() {
+  fs.readFile(googleCredentials, (err, content) => {
+    if (err) return console.log('Error loading client secret file:', err);
+    authorize(JSON.parse(content), createPeople);
+  });
+}
 
 function authorize(credentials, callback) {
   const { client_secret, client_id, redirect_uris } = credentials.installed;
@@ -53,8 +53,10 @@ function getNewToken(oAuth2Client, callback) {
     });
   });
 }
-
+// grab name, linkedin url and github url
 function createPeople(auth) {
+  if (fs.existsSync(cohortPath)) return console.log('people.json already created');
+  const { cohort } = getFromFile('credentials.json');
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get({
     spreadsheetId: '17ewhQD6dM97PgegSn_M9LCFIloDw7VJevDe9Pc4_ZuI',
@@ -63,7 +65,6 @@ function createPeople(auth) {
     if (err) return console.log(`The API returned an error: ${err}`);
     const rows = res.data.values;
     if (rows.length) {
-      // Print columns A and E, which correspond to indices 0 and 4.
       const cohortMate = [];
       rows.map((row) => {
         const person = {};
@@ -78,4 +79,8 @@ function createPeople(auth) {
       console.log('No data found.');
     }
   });
+}
+
+module.exports = {
+  oauthAndCreate,
 }
