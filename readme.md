@@ -28,4 +28,4 @@ Steps
 
    - view (-v, --view): by default this script runs puppeteer in headless mode, and doesn't load any images, css, or fonts in order to save time / bandwidth. if you set this flag, you can see all your friends' faces as you programmatically tell them that you believe in their abilities.
 
-That should be it! If you have any questions / concerns / suggestions, you can probably direct them to Aryeh, but this is Steve B speaking, so that's an easy call for me to make. (You can come to me as well.)
+That should be it! If you have any questions / concerns / suggestions, each out to me, Aryeh from cohort 20 or Steve B from cohort 19.
