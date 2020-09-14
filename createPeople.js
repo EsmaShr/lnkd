@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
@@ -55,7 +54,7 @@ function getNewToken(oAuth2Client, callback) {
 }
 // grab name, linkedin url and github url
 function createPeople(auth) {
-  if (fs.existsSync(cohortPath)) return console.log('people.json already created');
+  // if (fs.existsSync(cohortPath)) return console.log('people.json already created');
   const { cohort } = getFromFile('credentials.json');
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get({
@@ -68,9 +67,9 @@ function createPeople(auth) {
       const cohortMate = [];
       rows.map((row) => {
         const person = {};
-        person.name = row[0],
-        person.linkedin = { url: row[3], didVisit: false },
-        person.github = { url: row[4], didVisit: false },
+        person.name = row[0];
+        person.linkedin = { url: row[3], didVisit: false };
+        person.github = { url: row[4], didVisit: false };
         cohortMate.push(person);
       });
       console.log(cohortMate);

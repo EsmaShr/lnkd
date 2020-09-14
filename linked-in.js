@@ -8,17 +8,17 @@ const puppeteer = require('puppeteer');
 
 const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
 const { preventStaticAssetLoading, login, launchPage } = require('./utils/puppeteerUtils');
-
-let frenz = getFromFile('people.json');
-let { username } = getFromFile('credentials.json');
-const saveSeen = saveToFile('people.json');
+const fs = require('fs')
 
 const LOGIN_PAGE_URL =
   'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin';
 
 if (resetFlagSet()) frenz = resetSeen(frenz, 'linkedin');
 
-const helpFrenz = async () => {
+const helpLinkedInFriends = async () => {
+  let frenz = getFromFile('people.json');
+  let { username } = getFromFile('credentials.json');
+  const saveSeen = saveToFile('people.json');
   try {
     let { page, browser } = await launchPage();
 
@@ -89,4 +89,8 @@ const helpFrenz = async () => {
   }
 };
 
-helpFrenz();
+// helpLinkedInFriends();
+
+module.exports = {
+  helpLinkedInFriends,
+}

@@ -18,7 +18,7 @@ const saveSeen = saveToFile('projects.json');
 
 // if (resetFlagSet()) frenz = resetSeen(frenz);
 
-const helpFrenz = async () => {
+const helpGitHubFriends = async () => {
   try {
     let { page, browser } = await launchPage();
 
@@ -89,4 +89,8 @@ const helpFrenz = async () => {
     console.log(err);
   }
 };
-helpFrenz();
+// helpGitHubFriends();
+
+module.exports = {
+  helpGitHubFriends,
+}

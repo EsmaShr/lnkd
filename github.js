@@ -9,16 +9,16 @@
 const puppeteer = require('puppeteer');
 const { getFromFile, saveToFile, resetSeen, resetFlagSet } = require('./utils/fileUtils');
 const { preventStaticAssetLoading, login, launchPage } = require('./utils/puppeteerUtils');
+const fs = require('fs');
 
 const GITHUB_LOGIN_URL = 'https://github.com/login';
 
-let frenz = getFromFile('people.json');
-const { username } = getFromFile('credentials.json');
-const saveSeen = saveToFile('people.json');
-
 if (resetFlagSet()) frenz = resetSeen(frenz, 'github');
 
-const helpFrenz = async () => {
+const helpGitHubRepos = async () => {
+  let frenz = getFromFile('people.json');
+  let { username } = getFromFile('credentials.json');
+  const saveSeen = saveToFile('people.json');
   try {
     let { page, browser } = await launchPage();
 
@@ -102,4 +102,7 @@ const helpFrenz = async () => {
     console.log(err);
   }
 };
-helpFrenz();
+// helpGitHubRepos();
+module.exports = {
+  helpGitHubRepos,
+}

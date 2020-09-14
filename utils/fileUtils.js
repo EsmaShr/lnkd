@@ -4,6 +4,7 @@ const path = require('path');
 const makeFilePath = (filename) => path.join(__dirname, '../data/', filename);
 
 const getFromFile = (filename) => {
+  if (!filename) return undefined;
   const filePath = makeFilePath(filename);
   const raw = fs.readFileSync(filePath);
   const parsed = JSON.parse(raw);
