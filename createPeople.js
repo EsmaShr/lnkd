@@ -73,6 +73,8 @@ function createPeople(auth) {
         cohortMate.push(person);
       });
       console.log(cohortMate);
+      console.info(`Above is the cohort that was generated from the google spreadsheet... for cohort ${cohort}`);
+      console.info(`If you'd like to switch to another cohort, please run 'npm run kudos' again`);
       fs.writeFileSync(cohortPath, JSON.stringify(cohortMate));
     } else {
       console.log('No data found.');
