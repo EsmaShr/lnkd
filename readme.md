@@ -14,7 +14,7 @@ Steps
 4. Now you can start endorsing! 
    - `npm run kudos`
    - Select which script you would like to run
-   - If you'd like to switch to previous cohort to support them, select option 5
+   - If you'd like to switch to a different cohort to support them, select option 5
 5. Due to the fragile nature of surfing the radical net with puppeteer, you might have to try more than once to get everyone. The JSON files will remember who you've already successfully helped. Just run the script again. 
    - Linkedin is the trickiest one... it sometimes times out. If it does, just run again, it will remember your place.
 6. If you'd like to reset the didVisit flags, you can select option 6 in the menu
