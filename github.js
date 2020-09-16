@@ -47,55 +47,56 @@ const helpGitHubRepos = async () => {
       await page.evaluate(() =>
         document.querySelector('.js-form-toggle-target input[value="Follow"]').click()
       );
-      const repoPage = await page.evaluate(() => {
-        const root = window.location.origin;
-        const clickLink = document
-          .querySelector('.UnderlineNav-body a:nth-child(2)')
-          .getAttribute('href');
-        return root + clickLink;
-      });
-      // console.log(repoPage);
-      await nextPage(repoPage);
+      console.log(`now following ${name}`)
+      // const repoPage = await page.evaluate(() => {
+      //   const root = window.location.origin;
+      //   const clickLink = document
+      //     .querySelector('.UnderlineNav-body a:nth-child(2)')
+      //     .getAttribute('href');
+      //   return root + clickLink;
+      // });
+      // // console.log(repoPage);
+      // await nextPage(repoPage);
 
-      async function nextPage(url) {
-        await page.goto(url);
-        await page.$('#user-repositories-list');
-        // remove all already starred items before grabbing repos to star...
-        await page.$$eval('form[hidden="hidden"]', (starred) => {
-          starred.forEach(e => e.parentNode.removeChild(e));
-        });
-        const repos = await page.$$('button[value="Star"]');
-        console.log(repos.length, 'repos found for', name);
-        if (repos.length !== 0) {
-          for (const repo of repos) {
-            repo.click();
-            await page.waitFor(150);
-            console.log(`repo clicked for ${name}`);
-          }
-          fren.github.didVisit = true;
-          saveSeen(frenz);
-        } else {
-          fren.github.didVisit = true;
-          saveSeen(frenz);
-          console.log(`no more repos to click on this page for ${name}`);
-        }
-        try {
-          const nextText = await page.evaluate(
-            () => document.querySelector('.BtnGroup').childNodes[1].innerText
-          );
-          const moreRepos = await page.evaluate(() =>
-            document.querySelector('.BtnGroup').childNodes[1].getAttribute('href')
-          );
-          if (nextText === 'Next' && moreRepos !== null) {
-            console.log('link to more repos ', moreRepos);
-            await nextPage(moreRepos);
-          } else {
-            return;
-          }
-        } catch (err) {
-          return;
-        }
-      }
+      // async function nextPage(url) {
+      //   await page.goto(url);
+      //   await page.$('#user-repositories-list');
+      //   // remove all already starred items before grabbing repos to star...
+      //   await page.$$eval('form[hidden="hidden"]', (starred) => {
+      //     starred.forEach(e => e.parentNode.removeChild(e));
+      //   });
+      //   const repos = await page.$$('button[value="Unstar"]');
+      //   console.log(repos.length, 'repos found for', name);
+      //   if (repos.length !== 0) {
+      //     for (const repo of repos) {
+      //       repo.click();
+      //       await page.waitFor(150);
+      //       console.log(`repo unclicked for ${name}`);
+      //     }
+      //     fren.github.didVisit = true;
+      //     saveSeen(frenz);
+      //   } else {
+      //     fren.github.didVisit = true;
+      //     saveSeen(frenz);
+      //     console.log(`no more repos to click on this page for ${name}`);
+      //   }
+      //   try {
+      //     const nextText = await page.evaluate(
+      //       () => document.querySelector('.BtnGroup').childNodes[1].innerText
+      //     );
+      //     const moreRepos = await page.evaluate(() =>
+      //       document.querySelector('.BtnGroup').childNodes[1].getAttribute('href');
+      //     );
+      //     if (nextText === 'Next' && moreRepos !== null) {
+      //       console.log('link to more repos ', moreRepos);
+      //       await nextPage(moreRepos);
+      //     } else {
+      //       return;
+      //     }
+      //   } catch (err) {
+      //     return;
+      //   }
+      // }
     }
     browser.close();
   } catch (err) {

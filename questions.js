@@ -1,10 +1,11 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
+const figlet = require('figlet');
 const { makeFilePath, getFromFile } = require('./utils/fileUtils');
 const { helpGitHubFriends } = require('./github-projects');
 const { helpGitHubRepos } = require('./github');
 const { helpLinkedInFriends } = require('./linked-in');
-const { oauthAndCreate } = require('./createPeople');
+const { readSpreadsheet } = require('./google-reader');
 
 const credentialsPath = makeFilePath('credentials.json');
 const credentials = getFromFile('credentials.json');
@@ -16,7 +17,7 @@ function startQuiz() {
         name: 'script',
         type: 'rawlist',
         message: 'Which app would you like to run?',
-        choices: ['Login, select cohort and build people object', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Star all github repos', 'Switch to another cohort', new inquirer.Separator(), 'Start fresh'],
+        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their repos', 'Switch to another cohort', new inquirer.Separator(), 'Start fresh'],
       },
       {
         name: 'cohort',
@@ -31,7 +32,7 @@ function startQuiz() {
       if (answer.cohort && answer.script === 'Switch to another cohort') {
         credentials.cohort = answer.cohort;
         fs.writeFileSync(credentialsPath, JSON.stringify(credentials));
-        oauthAndCreate();
+        readSpreadsheet();
       }
       if (answer.script === 'Endorse all skills on LinkedIn') {
         helpLinkedInFriends();
@@ -39,10 +40,10 @@ function startQuiz() {
       if (answer.script === 'Star all OSLabs projects') {
         helpGitHubFriends();
       }
-      if (answer.script === 'Star all github repos') {
+      if (answer.script === 'Follow all on github and star all of their repos') {
         helpGitHubRepos();
       }
-      if (answer.script === 'Start fresh' || answer.script === 'Login, select cohort and build people object') {
+      if (answer.script === 'Start fresh' || answer.script === 'Start here... enter credentials and build') {
         createCohort();
       }
     });
@@ -102,8 +103,9 @@ function createCohort() {
           password: answer.linkedin_password,
         };
         credentials.cohort = answer.cohort;
+        credentials.firstname = answer.firstname;
         fs.writeFileSync(credentialsPath, JSON.stringify(credentials));
-        oauthAndCreate();
+        readSpreadsheet();
       } else {
         console.log('K, cool.... let\'s try that again');
         createCohort();
@@ -111,4 +113,12 @@ function createCohort() {
     });
 }
 
-startQuiz();
+figlet(`Hi ${credentials.firstname || 'Friend'}!!!`, (err, data) => {
+  if (err) {
+    console.log('Something went wrong...');
+    console.dir(err);
+    return;
+  }
+  console.log(data);
+  startQuiz();
+});
