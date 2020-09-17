@@ -40,10 +40,14 @@ const helpLinkedInFriends = async () => {
         console.log(fren.name, ' --- already helped --- skipping...');
         continue;
       }
+      if (!fren.linkedin.url.length) {
+        console.log(`${fren.name} --- no url found --- skipping....`);
+        continue;
+      }
       const { name } = fren;
       await page.goto(fren.linkedin.url);
       // check for pending connection
-      if ((await page.$('.artdeco-button--disabled')) !== null) {
+      if ((await page.$('.pv-s-profile-actions--connect.artdeco-button--disabled')) !== null) {
         console.log(`pending connection with ${name}`);
         continue;
       }
@@ -65,7 +69,7 @@ const helpLinkedInFriends = async () => {
             });
           });
   
-          // if no click more skills button... they probably haven't added anything relevant... also skips over people who haven't added shit
+          // if no click more skills button... they probably haven't added anything relevant for us to endorse... also skips over people who haven't added anything
           try {
             await page.waitForSelector('.pv-skills-section__chevron-icon', { timeout: 1500 });
             await page.click('.pv-skills-section__chevron-icon');
