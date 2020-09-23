@@ -22,7 +22,7 @@ const helpGitHubRepos = async () => {
   const { username } = getFromFile('credentials.json');
   const saveSeen = saveToFile('people.json');
   try {
-    const { page, browser } = await launchPage();
+    let { page, browser } = await launchPage();
 
     // prevents loading of images / css assets / fonts
     page = await preventStaticAssetLoading(page);

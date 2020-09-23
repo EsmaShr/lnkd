@@ -52,7 +52,7 @@ const login = async (page, site) => {
 
 const launchPage = async () => {
   const visible = isVisible();
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   // sets a viewing window if the viewport will be visible
