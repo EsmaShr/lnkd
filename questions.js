@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
+const CFonts = require('cfonts');
 const figlet = require('figlet');
 const { makeFilePath, getFromFile } = require('./utils/fileUtils');
 const { helpGitHubFriends } = require('./github-projects');
@@ -122,12 +123,10 @@ function createCohort() {
     });
 }
 
-figlet(`Hi ${credentials.firstname || 'Friend'}!!!`, (err, data) => {
-  if (err) {
-    console.log('Something went wrong...');
-    console.dir(err);
-    return;
-  }
-  console.log(data);
-  startQuiz();
+CFonts.say(`Hi ${credentials.firstname || 'Friend'}!!!`, {
+  font: 'pallet',
+  space: false,
+  gradient: ['#F61CB9', '#07D569', '#1C92F6'],
+  transitionGradient: true,
 });
+startQuiz();
