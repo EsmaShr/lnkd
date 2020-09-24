@@ -17,7 +17,7 @@ function startQuiz() {
         name: 'script',
         type: 'rawlist',
         message: 'Which app would you like to run?',
-        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Start fresh'],
+        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their pinned repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Start fresh'],
       },
       {
         name: 'cohort',
@@ -50,7 +50,7 @@ function startQuiz() {
       if (answer.script === 'Star all OSLabs projects') {
         helpGitHubFriends();
       }
-      if (answer.script === 'Follow all on github and star all of their repos') {
+      if (answer.script === 'Follow all on github and star all of their pinned repos') {
         helpGitHubRepos();
       }
       if (answer.script === 'Start fresh' || answer.script === 'Start here... enter credentials and build') {
