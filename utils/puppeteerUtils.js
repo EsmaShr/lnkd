@@ -1,7 +1,10 @@
 const puppeteer = require('puppeteer');
 const { getFromFile } = require('./fileUtils');
 
-const isVisible = () => process.argv.includes('--view') || process.argv.includes('-v');
+const isVisible = () => {
+
+  return getFromFile('credentials.json').isVisible;
+};
 
 const preventStaticAssetLoading = async (page) => {
   // will only load assets if the page is going to be visible
@@ -51,8 +54,8 @@ const login = async (page, site) => {
 };
 
 const launchPage = async () => {
-  const visible = isVisible();
-  const browser = await puppeteer.launch({ headless: true });
+  const visible = !isVisible();
+  const browser = await puppeteer.launch({ headless: visible });
   const page = await browser.newPage();
 
   // sets a viewing window if the viewport will be visible

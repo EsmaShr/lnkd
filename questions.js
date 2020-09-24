@@ -9,7 +9,6 @@ const { readSpreadsheet } = require('./google-reader');
 
 const credentialsPath = makeFilePath('credentials.json');
 const credentials = getFromFile('credentials.json');
-
 function startQuiz() {
   inquirer
     .prompt([
@@ -17,14 +16,19 @@ function startQuiz() {
         name: 'script',
         type: 'rawlist',
         message: 'Which app would you like to run?',
-        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their repos', 'Switch to another cohort', new inquirer.Separator(), 'Start fresh'],
+        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Start fresh'],
       },
       {
         name: 'cohort',
         message: 'Which cohort would you like to support?',
         type: 'number',
         when: (answer) => answer.script === 'Switch to another cohort',
-
+      },
+      {
+        name: 'headless',
+        message: 'Do you want the browser to be visible?',
+        type: 'confirm',
+        when: (answer) => answer.script === 'Run visible?',
       },
     ])
     .then((answer) => {
@@ -33,6 +37,11 @@ function startQuiz() {
         credentials.cohort = answer.cohort;
         fs.writeFileSync(credentialsPath, JSON.stringify(credentials));
         readSpreadsheet();
+      }
+      if (answer.script === 'Run visible?') {
+        credentials.isVisible = answer.headless;
+        fs.writeFileSync(credentialsPath, JSON.stringify(credentials));
+        startQuiz();
       }
       if (answer.script === 'Endorse all skills on LinkedIn') {
         helpLinkedInFriends();
