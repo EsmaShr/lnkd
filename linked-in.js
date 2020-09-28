@@ -47,7 +47,7 @@ const helpLinkedInFriends = async () => {
       const { name } = fren;
       await page.goto(fren.linkedin.url);
       // check for pending connection
-      if ((await page.$('.pv-s-profile-actions--connect.artdeco-button--disabled')) !== null) {
+      if ((await page.$('.pv-s-profile-actions--connect.artdeco-button--disabled'), { timeout: 1500 }) !== null) {
         console.log(`pending connection with ${name}`);
         continue;
       }

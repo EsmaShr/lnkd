@@ -59,7 +59,7 @@ const launchPage = async () => {
   const page = await browser.newPage();
 
   // sets a viewing window if the viewport will be visible
-  if (visible) await page.setViewport({ width: 1280, height: 800 });
+  if (!visible) await page.setViewport({ width: 1280, height: 800 });
   return { page, browser };
 };
 
