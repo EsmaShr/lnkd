@@ -57,9 +57,9 @@ const helpLinkedInFriends = async () => {
       // check for pending connection
       if (
         (await page.$(
-          ".pv-s-profile-actions--connect.artdeco-button--disabled"
-        ),
-        { timeout: 1500 }) !== null
+          ".pv-s-profile-actions--connect.artdeco-button--disabled",
+          { timeout: 1500 }
+        )) !== null
       ) {
         console.log(`pending connection with ${name}`);
         continue;
@@ -72,7 +72,8 @@ const helpLinkedInFriends = async () => {
         });
         await page.click(".pv-s-profile-actions--connect");
         await page.waitForSelector(
-          ".artdeco-modal__actionbar .artdeco-button--primary"
+          ".artdeco-modal__actionbar .artdeco-button--primary",
+          { timeout: 1500 }
         );
         await page.click(".artdeco-modal__actionbar .artdeco-button--primary");
         console.log(`clicked connect for ${name}`);
