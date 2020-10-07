@@ -5,6 +5,7 @@ const figlet = require('figlet');
 const { makeFilePath, getFromFile } = require('./utils/fileUtils');
 const { helpGitHubFriends } = require('./github-projects');
 const { helpGitHubRepos } = require('./github');
+const { bulkAddOpenSource } = require('./open-source');
 const { helpLinkedInFriends } = require('./linked-in');
 const { readSpreadsheet } = require('./google-reader');
 
@@ -17,7 +18,7 @@ function startQuiz() {
         name: 'script',
         type: 'rawlist',
         message: 'Which app would you like to run?',
-        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their pinned repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Start fresh'],
+        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their pinned repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Make some friends... connect with all that work at Open Source', 'Start fresh'],
       },
       {
         name: 'cohort',
@@ -43,6 +44,9 @@ function startQuiz() {
         credentials.isVisible = answer.headless;
         fs.writeFileSync(credentialsPath, JSON.stringify(credentials));
         startQuiz();
+      }
+      if (answer.script === 'Make some friends... connect with all that work at Open Source') {
+        bulkAddOpenSource();
       }
       if (answer.script === 'Endorse all skills on LinkedIn') {
         helpLinkedInFriends();
