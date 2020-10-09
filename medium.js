@@ -21,9 +21,18 @@ const {
 } = require("./utils/puppeteerUtils");
 // #susi-modal-google-button a
 
-// Email input class
-// whsOnd zHQkBf
+// https://medium.com/m/signin
+//document.querySelector('input[type="email"]')
 
+// type email
+// press enter
+
+// await password
+// await enter press
+//document.querySelector('input[type="email"]')
+
+// await network idle
+// 
 const helpClapMedium = async () => {
   const frenz = getFromFile("people.json");
   const { username } = getFromFile("credentials.json");

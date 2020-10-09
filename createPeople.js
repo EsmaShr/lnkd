@@ -1,3 +1,7 @@
+/*
+Not used any more... way over the top OAuth that used to be in the CLI, just leaving for reference
+*/
+
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');

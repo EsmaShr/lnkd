@@ -4,29 +4,28 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
-const puppeteer = require("puppeteer");
+const puppeteer = require('puppeteer');
 
-const fs = require("fs");
+const fs = require('fs');
 const {
   getFromFile,
   saveToFile,
   resetSeen,
   resetFlagSet,
-} = require("./utils/fileUtils");
+} = require('./utils/fileUtils');
 const {
   preventStaticAssetLoading,
   login,
   launchPage,
-} = require("./utils/puppeteerUtils");
+} = require('./utils/puppeteerUtils');
 
-const LOGIN_PAGE_URL =
-  "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
+const LOGIN_PAGE_URL = 'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin';
 
-if (resetFlagSet()) frenz = resetSeen(frenz, "linkedin");
+if (resetFlagSet()) frenz = resetSeen(frenz, 'linkedin');
 
 const bulkAddOpenSource = async () => {
-  const frenz = getFromFile("people.json");
-  const { username } = getFromFile("credentials.json");
+  const frenz = getFromFile('people.json');
+  const { username } = getFromFile('credentials.json');
   try {
     let { page, browser } = await launchPage();
 
@@ -36,18 +35,17 @@ const bulkAddOpenSource = async () => {
     await page.goto(LOGIN_PAGE_URL);
 
     // LOGIN
-    page = await login(page, "linkedin");
+    page = await login(page, 'linkedin');
 
-    const bulkUrl =
-      "https://www.linkedin.com/company/open-source-reactvt/people/";
+    const bulkUrl = 'https://www.linkedin.com/company/open-source-reactvt/people/';
 
     await page.goto(bulkUrl);
-    await page.waitForSelector(".org-people-profiles-module__profile-list");
+    await page.waitForSelector('.org-people-profiles-module__profile-list');
 
     // first we need to delete the message area
     await page.evaluate(() => {
       const messages = document.querySelector(
-        ".msg-overlay-list-bubble--expanded"
+        '.msg-overlay-list-bubble--expanded',
       );
       messages.parentNode.removeChild(messages);
     });
@@ -59,14 +57,13 @@ const bulkAddOpenSource = async () => {
       });
       await page.waitFor(2500);
     }
-    //let test = document.querySelectorAll('.org-people-profile-card button[type="button"]')
 
     const openSourceFriends = await page.$$(
-      '.org-people-profile-card button[type="button"]'
+      '.org-people-profile-card button[type="button"]',
     );
     for (friend of openSourceFriends) {
       await friend.click();
-      console.log('open source friend added')
+      console.log('open source friend added');
       await page.waitForSelector('[aria-label="Send now"]', {
         timeout: 1500,
       });
