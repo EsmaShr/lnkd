@@ -79,6 +79,14 @@ const helpLinkedInFriends = async () => {
         console.log(`clicked connect for ${name}`);
       } catch {
         if ((await page.$(".pv-s-profile-actions--message")) !== null) {
+              // first we need to delete the message area
+          await page.waitForSelector('.msg-overlay-list-bubble--expanded');
+          await page.evaluate(() => {
+            const messages = document.querySelector(
+              ".msg-overlay-list-bubble--expanded"
+            );
+            messages.parentNode.removeChild(messages);
+          });
           await page.evaluate(() => {
             window.scrollTo({
               left: 0,
