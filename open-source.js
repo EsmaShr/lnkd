@@ -64,14 +64,19 @@ const bulkAddOpenSource = async () => {
     const openSourceFriends = await page.$$(
       '.org-people-profile-card button[type="button"]'
     );
+    let friendCounter = 1;
     for (friend of openSourceFriends) {
-      await friend.click();
-      console.log('open source friend added')
-      await page.waitForSelector('[aria-label="Send now"]', {
-        timeout: 1500,
-      });
-      await page.click('[aria-label="Send now"]', { timeout: 1500 });
-      await page.waitFor(500);
+      if (friendCounter < 130) {
+        await friend.click();
+        console.log('open source friend added')
+        await page.waitForSelector('[aria-label="Send now"]', {
+          timeout: 1500,
+        });
+        await page.click('[aria-label="Send now"]', { timeout: 1500 });
+        await page.waitFor(200);
+        friendCounter += 1;
+        await page.waitFor(200);
+      }
     }
   } catch (err) {
     console.log(err);
