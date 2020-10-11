@@ -80,13 +80,13 @@ const helpLinkedInFriends = async () => {
       } catch {
         if ((await page.$(".pv-s-profile-actions--message")) !== null) {
               // first we need to delete the message area
-          await page.waitForSelector('.msg-overlay-list-bubble--expanded');
-          await page.evaluate(() => {
-            const messages = document.querySelector(
-              ".msg-overlay-list-bubble--expanded"
-            );
-            messages.parentNode.removeChild(messages);
-          });
+          // await page.waitForSelector('.msg-overlay-list-bubble--expanded');
+          // await page.evaluate(() => {
+          //   const messages = document.querySelector(
+          //     ".msg-overlay-list-bubble--expanded"
+          //   );
+          //   messages.parentNode.removeChild(messages);
+          // });
           await page.evaluate(() => {
             window.scrollTo({
               left: 0,
@@ -100,7 +100,9 @@ const helpLinkedInFriends = async () => {
             await page.waitForSelector(".pv-skills-section__chevron-icon", {
               timeout: 1500,
             });
-            await page.click(".pv-skills-section__chevron-icon");
+            await page.evaluate(() => {
+              document.querySelector('.pv-skills-section__chevron-icon').click();
+            });
             await page.$$eval('[type="plus-icon"]', (skillz) =>
               skillz.forEach((skill) => skill.click())
             );

@@ -118,7 +118,7 @@ function createCohort() {
         };
         credentials.cohort = answer.cohort;
         credentials.firstname = answer.firstname;
-        credentials.isVisible = true;
+        // credentials.isVisible = true;
         fs.writeFileSync(credentialsPath, JSON.stringify(credentials));
         readSpreadsheet();
       } else {
