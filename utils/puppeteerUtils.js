@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 const { getFromFile } = require('./fileUtils');
 
 const isVisible = () => {
-
   return getFromFile('credentials.json').isVisible;
 };
 

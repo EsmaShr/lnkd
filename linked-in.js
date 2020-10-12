@@ -22,8 +22,6 @@ const {
 const LOGIN_PAGE_URL =
   "https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin";
 
-if (resetFlagSet()) frenz = resetSeen(frenz, "linkedin");
-
 const helpLinkedInFriends = async () => {
   const frenz = getFromFile("people.json");
   const { username } = getFromFile("credentials.json");
@@ -79,14 +77,6 @@ const helpLinkedInFriends = async () => {
         console.log(`clicked connect for ${name}`);
       } catch {
         if ((await page.$(".pv-s-profile-actions--message")) !== null) {
-              // first we need to delete the message area
-          // await page.waitForSelector('.msg-overlay-list-bubble--expanded');
-          // await page.evaluate(() => {
-          //   const messages = document.querySelector(
-          //     ".msg-overlay-list-bubble--expanded"
-          //   );
-          //   messages.parentNode.removeChild(messages);
-          // });
           await page.evaluate(() => {
             window.scrollTo({
               left: 0,

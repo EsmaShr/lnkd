@@ -22,9 +22,21 @@ const resetSeen = (all, site) => {
     all = all.map((entry) => ({ ...entry, didVisit: false }));
   } else {
     const keys = Object.keys(all);
-    for (let key of keys) all[key][site].didVisit = false;
+    for (const key of keys) all[key][site].didVisit = false;
   }
   return all;
+};
+
+const resetDidVisit = (arr, site) => {
+  for (let i = 0; i < arr.length; i += 1) {
+    if (site === 'all') {
+      arr[i].linkedin.didVisit = false;
+      arr[i].github.didVisit = false;
+    } else {
+      arr[i][site].didVisit = false;
+    }
+  }
+  return arr;
 };
 
 const resetFlagSet = () => process.argv.includes('-r') || process.argv.includes('--reset');
@@ -35,4 +47,5 @@ module.exports = {
   resetSeen,
   resetFlagSet,
   makeFilePath,
+  resetDidVisit,
 };
