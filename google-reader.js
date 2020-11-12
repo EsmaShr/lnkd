@@ -12,6 +12,7 @@ async function readSpreadsheet() {
   const { cohort } = getFromFile('credentials.json');
   await doc.useServiceAccountAuth(creds);
   await doc.loadInfo();
+  console.log('doc', doc)
   const tabs = {};
   // need to loop through sheets to get labels of tabs... this is what we enter into the inquirer prompt
   for (let i = 0; i < doc.sheetCount; i += 1) {
@@ -33,11 +34,13 @@ async function readSpreadsheet() {
       url: row.LinkedIn,
       didVisit: false,
     };
+    person.twitter = { handle: row.Twitter, didVisit: false };
     person.github = { url: row.Github, didVisit: false };
     cohortObject.push(person);
   });
   fs.writeFileSync(cohortPath, JSON.stringify(cohortObject));
   console.log(cohortObject);
+  console.log(`COHORT ${cohort} LOADED! try 'npm run kudos' again!`)
 }
 
 module.exports = {

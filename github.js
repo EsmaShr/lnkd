@@ -46,7 +46,11 @@ const helpGitHubRepos = async () => {
       }
       await page.goto(fren.github.url);
       const { name } = fren;
-      await page.evaluate(() => document.querySelector('.js-form-toggle-target input[value="Follow"]').click());
+      try {
+        await page.evaluate(() => document.querySelector('.js-form-toggle-target input[value="Follow"]').click());
+      } catch (err) {
+        "error in github . move on!"
+      }
       console.log(`now following ${name}`);
 
       // create array of urls from pinned repos
@@ -71,6 +75,7 @@ const helpGitHubRepos = async () => {
         console.log(`${name} hasn't pinned any repos for you to star...`);
       }
     }
+    console.log("Done running GitHub repos and stars")
     browser.close();
   } catch (err) {
     console.log(err);

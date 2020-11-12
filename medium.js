@@ -22,7 +22,6 @@ const {
 
 const helpClapMedium = async () => {
   const { username, gmail } = getFromFile("credentials.json");
-  
   const { gmail_user, password } = gmail;
   const URL = 'https://medium.com/m/signin';
   

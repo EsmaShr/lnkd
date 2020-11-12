@@ -107,6 +107,8 @@ const helpLinkedInFriends = async () => {
               console.log(`all skillz clicked for ${name}`);
             }
           } catch (err) {
+            console.log('error in linkedin friend: ', fren)
+
             continue;
           }
         }
@@ -114,7 +116,8 @@ const helpLinkedInFriends = async () => {
     }
     browser.close();
   } catch (err) {
-    console.log(err);
+    console.log('error in linkedin', err);
+    return;
   }
 };
 

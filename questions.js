@@ -5,6 +5,7 @@ const { makeFilePath, getFromFile, resetDidVisit } = require('./utils/fileUtils'
 const { helpGitHubFriends } = require('./github-projects');
 const { helpGitHubRepos } = require('./github');
 const { helpClapMedium } = require('./medium');
+const { twitterFollower } = require('./twitter');
 const { bulkAddOpenSource } = require('./open-source');
 const { helpLinkedInFriends } = require('./linked-in');
 const { readSpreadsheet } = require('./google-reader');
@@ -18,7 +19,7 @@ function startQuiz() {
         name: 'script',
         type: 'rawlist',
         message: 'Which app would you like to run?',
-        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their pinned repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Make some friends... connect with all that work at Open Source', 'Clap for your friends', 'Start fresh', 'Reset didVisit'],
+        choices: ['Start here... enter credentials and build', 'Endorse all skills on LinkedIn', 'Star all OSLabs projects', 'Follow all on github and star all of their pinned repos', 'Switch to another cohort', new inquirer.Separator(), 'Run visible?', 'Make some friends... connect with all that work at Open Source', 'Clap for your friends', 'Follow everyone on Twitter', 'Start fresh', 'Reset didVisit'],
       },
       {
         name: 'cohort',
@@ -72,6 +73,9 @@ function startQuiz() {
       }
       if (answer.script === 'Clap for your friends') {
         mediumSetup();
+      }
+      if (answer.script === 'Follow everyone on Twitter') {
+        twitterFollower();
       }
       if (answer.script === 'Start fresh' || answer.script === 'Start here... enter credentials and build') {
         createCohort();
@@ -136,13 +140,23 @@ function createCohort() {
       },
       {
         name: 'linkedin_username',
-        message: 'What is your linkedin username?',
+        message: 'What is your linkedin username? (usually, this is your email address)',
       },
       {
         name: 'linkedin_password',
         mask: '*',
         type: 'password',
         message: 'What is your linkedin password?',
+      },
+      {
+        name: 'twitter_handle',
+        message: 'What is your twitter handle? (WITHOUT the "@", please!)',
+      },
+      {
+        name: 'twitter_password',
+        mask: '*',
+        type: 'password',
+        message: 'What is your twitter password?',
       },
       {
         name: 'cohort',
@@ -165,6 +179,10 @@ function createCohort() {
         credentials.linkedin = {
           username: answer.linkedin_username,
           password: answer.linkedin_password,
+        };
+        credentials.twitter = {
+          handle: answer.twitter_handle,
+          password: answer.twitter_password,
         };
         credentials.cohort = answer.cohort;
         credentials.firstname = answer.firstname;
